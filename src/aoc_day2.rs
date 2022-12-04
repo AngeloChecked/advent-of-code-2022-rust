@@ -78,11 +78,8 @@ pub const ROUND_POINTS: [(RoundResult, i32); 3] = [
 
 fn find<T, B>(list: &[(T, B)], key: T) -> B
 where
-    T: Debug,
-    T: Eq,
-    T: PartialEq,
-    B: Debug,
-    B: Clone,
+    T: Debug + Eq + PartialEq,
+    B: Debug + Clone,
 {
     list.iter()
         .find(|(innkey, _)| *innkey == key)
