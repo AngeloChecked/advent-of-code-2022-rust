@@ -91,8 +91,8 @@ where
 pub fn parse_round_inputs(raw_rounds: Vec<String>) -> Vec<(Hand, Hand)> {
     let mut result = Vec::new();
     for raw_round in raw_rounds {
-        let players_hands_raw: Vec<&str> = raw_round.split(" ").collect();
-        let left_hand = find(&LEFT_SYMBOLS, players_hands_raw.get(0).unwrap());
+        let players_hands_raw: Vec<&str> = raw_round.split(' ').collect();
+        let left_hand = find(&LEFT_SYMBOLS, players_hands_raw.first().unwrap());
         let right_hand = find(&RIGHT_SYMBOLS, players_hands_raw.get(1).unwrap());
         result.push((left_hand, right_hand));
     }
@@ -111,8 +111,8 @@ pub fn solution(raw_rounds: Vec<String>) -> usize {
 pub fn parse_round_requests(raw_rounds: Vec<String>) -> Vec<(Hand, RoundResult)> {
     let mut result = Vec::new();
     for raw_round in raw_rounds {
-        let players_hands_raw: Vec<&str> = raw_round.split(" ").collect();
-        let left_hand = find(&LEFT_SYMBOLS, players_hands_raw.get(0).unwrap());
+        let players_hands_raw: Vec<&str> = raw_round.split(' ').collect();
+        let left_hand = find(&LEFT_SYMBOLS, players_hands_raw.first().unwrap());
         let round_request = find(
             &ROUND_END_REQUEST_SYMBOLS,
             players_hands_raw.get(1).unwrap(),

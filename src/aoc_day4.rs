@@ -19,16 +19,16 @@ pub fn parse_elf_assigments(
 fn split_two(text: String, symbol: &str) -> (String, String) {
     let text_splitted: Vec<&str> = text.split(symbol).collect();
     (
-        text_splitted.get(0).unwrap().to_string(),
+        text_splitted.first().unwrap().to_string(),
         text_splitted.get(1).unwrap().to_string(),
     )
 }
 
 pub fn is_contained(range_one: RangeInclusive<usize>, range_two: RangeInclusive<usize>) -> bool {
-    let first = range_one.clone().into_iter().nth(0).unwrap();
+    let first = range_one.clone().into_iter().next().unwrap();
     let last = range_one.into_iter().last().unwrap();
 
-    let first_two = range_two.clone().into_iter().nth(0).unwrap();
+    let first_two = range_two.clone().into_iter().next().unwrap();
     let last_two = range_two.into_iter().last().unwrap();
     first >= first_two && last <= last_two
 }

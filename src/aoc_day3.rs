@@ -48,7 +48,7 @@ pub fn parse_elf_groups(
         let groups_as: Vec<HashSet<char>> = elf_group_items
             .iter()
             .map(|g| g.chars().collect::<Vec<char>>())
-            .map(|g| HashSet::from_iter(g))
+            .map(HashSet::from_iter)
             .collect();
         let one_group: HashSet<char> = groups_as.get(0).unwrap().clone();
         let two_group: HashSet<char> = groups_as.get(1).unwrap().clone();
@@ -61,7 +61,7 @@ pub fn parse_elf_groups(
 pub fn item_priority_in_groups(
     (group_one, group_two, group_three): (HashSet<char>, HashSet<char>, HashSet<char>),
 ) -> usize {
-    let two_and_three: HashSet<char> = group_two.intersection(&group_three).map(|g| *g).collect();
+    let two_and_three: HashSet<char> = group_two.intersection(&group_three).copied().collect();
     let one_two_and_three: HashSet<&char> = group_one.intersection(&two_and_three).collect();
 
     let char = one_two_and_three.iter().last().unwrap();

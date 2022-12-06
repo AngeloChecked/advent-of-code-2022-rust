@@ -1,10 +1,10 @@
 pub fn group_food_calories_by_elf(calories_list: Vec<String>) -> Vec<usize> {
-    let clusters: Vec<&[String]> = calories_list.split(|e| e.to_string() == "").collect();
+    let clusters: Vec<&[String]> = calories_list.split(|e| (*e).is_empty()).collect();
     let mut result = Vec::new();
     for cluster in clusters {
         result.push(
             cluster
-                .into_iter()
+                .iter()
                 .map(|e| e.to_string().parse::<usize>().unwrap())
                 .sum(),
         );
