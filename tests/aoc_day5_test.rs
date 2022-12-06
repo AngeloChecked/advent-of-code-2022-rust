@@ -1,4 +1,7 @@
-use advent_of_code_2022_rust::aoc_day5::{parse_cargo, rotate_matrix_right, CrateMove};
+use advent_of_code_2022_rust::aoc_day5::{
+    apply_crate_moves_to_cargo, apply_crate_moves_to_cargo_all_together, parse_cargo,
+    rotate_matrix_right, solution, solution_part2, CrateMove,
+};
 
 #[test]
 fn parse_cargo_raw() {
@@ -64,7 +67,7 @@ fn test_parse_cargo_moves() {
         "move 8 from 1 to 9",
     ];
 
-    let cargo_moves: Vec<CrateMove> = raw_moves
+    let crate_moves: Vec<CrateMove> = raw_moves
         .into_iter()
         .map(|s| str::parse(s).unwrap())
         .collect();
@@ -86,5 +89,113 @@ fn test_parse_cargo_moves() {
             to: 9,
         },
     ];
-    assert_eq!(cargo_moves, expected);
+    assert_eq!(crate_moves, expected);
+}
+
+#[test]
+fn test_pick_crates_one_to_one() {
+    let crate_moves = vec![
+        CrateMove {
+            r#move: 1,
+            from: 2,
+            to: 1,
+        },
+        CrateMove {
+            r#move: 3,
+            from: 1,
+            to: 3,
+        },
+        CrateMove {
+            r#move: 2,
+            from: 2,
+            to: 1,
+        },
+        CrateMove {
+            r#move: 1,
+            from: 1,
+            to: 2,
+        },
+    ];
+    let cargo = vec![vec!['Z', 'N'], vec!['M', 'C', 'D'], vec!['P']];
+
+    let new_cargo = apply_crate_moves_to_cargo(cargo, crate_moves);
+
+    let expected = vec![vec!['C'], vec!['M'], vec!['P', 'D', 'N', 'Z']];
+    assert_eq!(new_cargo, expected);
+}
+
+#[test]
+fn first_of_each_stack() {
+    let lines = vec![
+        "    [D]    ",
+        "[N] [C]    ",
+        "[Z] [M] [P]",
+        " 1   2   3 ",
+        "",
+        "move 1 from 2 to 1",
+        "move 3 from 1 to 3",
+        "move 2 from 2 to 1",
+        "move 1 from 1 to 2",
+    ]
+    .into_iter()
+    .map(|s| s.to_string())
+    .collect();
+
+    let first_of_each_stack = solution(lines);
+
+    assert_eq!(first_of_each_stack, "CMZ");
+}
+
+#[test]
+fn test_pick_crates_all_together() {
+    let crate_moves = vec![
+        CrateMove {
+            r#move: 1,
+            from: 2,
+            to: 1,
+        },
+        CrateMove {
+            r#move: 3,
+            from: 1,
+            to: 3,
+        },
+        CrateMove {
+            r#move: 2,
+            from: 2,
+            to: 1,
+        },
+        CrateMove {
+            r#move: 1,
+            from: 1,
+            to: 2,
+        },
+    ];
+    let cargo = vec![vec!['Z', 'N'], vec!['M', 'C', 'D'], vec!['P']];
+
+    let new_cargo = apply_crate_moves_to_cargo_all_together(cargo, crate_moves);
+
+    let expected = vec![vec!['M'], vec!['C'], vec!['P', 'Z', 'N', 'D']];
+    assert_eq!(new_cargo, expected);
+}
+
+#[test]
+fn first_of_each_stack_solution_part2() {
+    let lines = vec![
+        "    [D]    ",
+        "[N] [C]    ",
+        "[Z] [M] [P]",
+        " 1   2   3 ",
+        "",
+        "move 1 from 2 to 1",
+        "move 3 from 1 to 3",
+        "move 2 from 2 to 1",
+        "move 1 from 1 to 2",
+    ]
+    .into_iter()
+    .map(|s| s.to_string())
+    .collect();
+
+    let first_of_each_stack = solution_part2(lines);
+
+    assert_eq!(first_of_each_stack, "MCD");
 }

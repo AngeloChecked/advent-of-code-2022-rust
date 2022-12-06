@@ -48,7 +48,7 @@ impl FromStr for CrateMove {
 }
 
 pub fn parse_cargo(lines: Vec<String>) -> Vec<Vec<char>> {
-    let interesting_lines = lines.into_iter().take_while(|l| *l != "");
+    let interesting_lines = lines.into_iter().take_while(|l| !(*l).is_empty());
     let cargo_lines: Vec<String> = interesting_lines
         .clone()
         .take(interesting_lines.count() - 1)
@@ -61,11 +61,10 @@ pub fn parse_cargo(lines: Vec<String>) -> Vec<Vec<char>> {
             .chunks(4)
             .map(|chunk| {
                 String::from_iter(chunk)
-                    .replace("[", "")
-                    .replace("]", "")
+                    .replace(['[', ']'], "")
                     .trim()
                     .chars()
-                    .nth(0)
+                    .next()
             })
             .collect();
         orizontal_cargo.push(orizontal_crates);
@@ -74,9 +73,17 @@ pub fn parse_cargo(lines: Vec<String>) -> Vec<Vec<char>> {
     let vertical_cargo_with_options = rotate_matrix_right(orizontal_cargo);
     let cargo: Vec<Vec<char>> = vertical_cargo_with_options
         .into_iter()
-        .map(|crates| crates.into_iter().filter_map(|c| c).collect())
+        .map(|crates| crates.into_iter().flatten().collect())
         .collect();
     cargo
+}
+
+pub fn parse_cargo_and_moves(lines: Vec<String>) -> Option<(Vec<Vec<char>>, Vec<CrateMove>)> {
+    let cargo_move_divisor_index = lines.iter().position(|l| l.is_empty())?;
+    let (cargo_raw, moves_raw) = lines.split_at(cargo_move_divisor_index);
+    let cargo = parse_cargo(Vec::from(cargo_raw));
+    let moves: Vec<CrateMove> = moves_raw.iter().flat_map(|s| str::parse(s)).collect();
+    Some((cargo, moves))
 }
 
 pub fn rotate_matrix_right<A>(matrix: Vec<Vec<A>>) -> Vec<Vec<A>>
@@ -92,4 +99,55 @@ where
         result.push(new_row);
     }
     result
+}
+
+pub fn apply_crate_moves_to_cargo(
+    cargo: Vec<Vec<char>>,
+    crate_moves: Vec<CrateMove>,
+) -> Vec<Vec<char>> {
+    crate_moves.into_iter().fold(cargo, |cargo, crate_move| {
+        apply_crate_move_to_cargo(cargo, crate_move)
+    })
+}
+
+fn apply_crate_move_to_cargo(mut cargo: Vec<Vec<char>>, crate_move: CrateMove) -> Vec<Vec<char>> {
+    for _ in 0..crate_move.r#move {
+        if let Some(crate_to_move) = cargo[crate_move.from - 1].pop() {
+            cargo[crate_move.to - 1].push(crate_to_move);
+        }
+    }
+    cargo
+}
+
+pub fn solution(lines: Vec<String>) -> String {
+    let (cargo, crate_moves) = parse_cargo_and_moves(lines).unwrap();
+    let new_cargo = apply_crate_moves_to_cargo(cargo, crate_moves);
+    String::from_iter(new_cargo.into_iter().filter_map(|s| s.into_iter().last()))
+}
+
+pub fn apply_crate_moves_to_cargo_all_together(
+    cargo: Vec<Vec<char>>,
+    crate_moves: Vec<CrateMove>,
+) -> Vec<Vec<char>> {
+    crate_moves.into_iter().fold(cargo, |cargo, crate_move| {
+        apply_crate_move_to_cargo_all_together(cargo, crate_move)
+    })
+}
+
+fn apply_crate_move_to_cargo_all_together(
+    mut cargo: Vec<Vec<char>>,
+    crate_move: CrateMove,
+) -> Vec<Vec<char>> {
+    let stack_to_pick: Vec<char> = cargo[crate_move.from - 1].clone();
+    let separation_index = stack_to_pick.len() - crate_move.r#move;
+    let (new_crate_stack, crates_to_move) = stack_to_pick.split_at(separation_index);
+    cargo[crate_move.from - 1] = Vec::from(new_crate_stack);
+    cargo[crate_move.to - 1].extend(Vec::from(crates_to_move));
+    cargo
+}
+
+pub fn solution_part2(lines: Vec<String>) -> String {
+    let (cargo, crate_moves) = parse_cargo_and_moves(lines).unwrap();
+    let new_cargo = apply_crate_moves_to_cargo_all_together(cargo, crate_moves);
+    String::from_iter(new_cargo.into_iter().filter_map(|s| s.into_iter().last()))
 }
